@@ -73,7 +73,7 @@ public class HotelController extends SRAParticipant {
 
     @Override
     protected SRAStatus updateParticipantState(SRAStatus status, String bookingId) {
-        System.out.printf("SRA: %s: Updating hotel participant state to: %s%n", bookingId, status);
+        System.out.printf("SRA: %s: Updating hotel participant state to: %s", bookingId, status);
         switch (status) {
             case TransactionCommitted:
                 hotelService.updateBookingStatus(bookingId, Booking.BookingStatus.CONFIRMED);

@@ -1,68 +1,34 @@
-OVERVIEW
---------
-An example of how to use REST-AT service.
 
-USAGE
---------------------
-TEST SRA PARTICIPANTS
+# start a REST-AT coordinator on port 8080
 
-Start a REST-AT coordinator on port 8080
+cd <narayana-repo>/jboss-as/build/target/wildfly-23.0.0.Beta1-SNAPSHOT
+cp docs/examples/configs/standalone-rts.xml standalone/configuration
+./bin/standalone.sh -c standalone-rts.xml
 
-    cd <narayana-repo>/jboss-as/build/target/wildfly-28.0.0.Final
-    cp docs/examples/configs/standalone-rts.xml standalone/configuration
-    ./bin/standalone.sh -c standalone-rts.xml
-
-VERIFY THAT IT IS RUNNING, eg:
-
-    curl http://localhost:8080/rest-at-coordinator/tx/transaction-manager
-
-BUILD  AND RUN THE DEMO APPLICATION on port 8081
-
-    cd <narayana-repo>/rts/sra
-    mvn clean package -Dquarkus.package.type=uber-jar
-    java $JAVA_OPTS -Dquarkus.http.port=8081 -jar target/sra-participant-runner.jar &
-    
-    OR
-    mvn quarkus:dev
-
-Book a trip within a transaction (see sra/demo/api/TripController.java method bookTrip)
-this starts a transaction and you can verify it is running using
+# verify that it is running, eg:
 curl http://localhost:8080/rest-at-coordinator/tx/transaction-manager
 
-    curl -XPOST http://localhost:8081/trip/book?hotelName=Rex
+# build and run the demo application on port 8081
+cd <narayana-repo>/rts/sra
+mvn clean install
+java $JAVA_OPTS -Dquarkus.http.port=8081 -jar target/sra-participant-runner.jar &
 
-EXPECTED OUTPUT
----------------
-    SRA: 0_ffff0a4cf0b6_-568c278f_6458bef8_7fb: Updating hotel participant state to: TransactionPrepared
+# book a trip within a transaction (see sra/demo/api/TripController.java method bookTrip)
+# this starts a transaction and you can verify it is running using
+# curl http://localhost:8080/rest-at-coordinator/tx/transaction-manager
+# except that the end attribute of `@SRA(value = SRA.Type.REQUIRED, end = false)` is ignored
+# either you or I can raise an issue for that
 
-    SRA: 0_ffff0a4cf0b6_-568c278f_6458bef8_7fb: Updating trip participant state to: TransactionPrepared
+curl -XPOST http://localhost:8081/trip/book?hotelName=Rex
 
-    SRA: 0_ffff0a4cf0b6_-568c278f_6458bef8_7fb: Updating trip participant state to: TransactionCommitted
+So you probably want to either change end = true (which is the default) or you would fix the bug.
+If the end attribute was respected then querying the transaction coordinator (`curl http://localhost:8080/rest-at-coordinator/tx/transaction-manager`) would report the in progress transaction.
 
-    SRA: 0_ffff0a4cf0b6_-568c278f_6458bef8_7fb: Updating hotel participant state to: TransactionCommitted
 
+# examples of how to manually test that the coordinator is working using curl
 
-EXAMPLE OF HOW TO MANUALLY TEST THAT THE COORDINATOR IS WORKING USING curl
----------------------------------------------------------------------------
+curl -H "Content-Type: application/x-www-form-urlencoded" -X POST http://localhost:8080/rest-at-coordinator/tx/transaction-manager
+curl http://localhost:8080/rest-at-coordinator/tx/transaction-manager
+curl -X PUT --data txstatus=TransactionCommitted http://localhost:8080/rest-at-coordinator/tx/transaction-manager/0_ffffc0a8000e_-60f54f29_60ad4e96_91/terminator
+curl http://localhost:8080/rest-at-coordinator/tx/transaction-manager
 
-    curl -H "Content-Type: application/x-www-form-urlencoded" -X POST http://localhost:8080/rest-at-coordinator/tx/transaction-manager
-    curl http://localhost:8080/rest-at-coordinator/tx/transaction-manager
-    curl -X PUT --data txstatus=TransactionCommitted http://localhost:8080/rest-at-coordinator/tx/transaction-manager/0_ffff0a4cf0b6_-568c278f_6458bef8_7fb/terminator
-    curl http://localhost:8080/rest-at-coordinator/tx/transaction-manager
-
-WHAT JUST HAPPENED?
--------------------
-
-1. We started REST-AT coordinator which is available to use in wildfly.
-
-2. We verified REST-AT coordinator by invoking the transaction manager url.
-
-3. Build and run the sar application, it starts the service on same port i.e 8081.
-
-4. Invoke book trip which start SRA and calls the hotel and flight service.
-
-5. The example performed an HTTP POST request and check that the transaction status code is 200.
-
-6. The example performs commit operation if the status code is 200.
-
-7. The example performed rollback operation if the status code is not 200 in any of the service.

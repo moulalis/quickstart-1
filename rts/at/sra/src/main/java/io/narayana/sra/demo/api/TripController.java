@@ -21,9 +21,14 @@
  */
 package io.narayana.sra.demo.api;
 
+import org.jboss.jbossts.star.annotation.SRA;
+import org.jboss.jbossts.star.annotation.Status;
+import org.jboss.jbossts.star.client.SRAParticipant;
 import io.narayana.sra.demo.model.Booking;
 import io.narayana.sra.demo.service.BookingException;
 import io.narayana.sra.demo.service.TripService;
+import org.jboss.jbossts.star.client.SRAStatus;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.RequestScoped;
@@ -42,11 +47,6 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.jboss.jbossts.star.annotation.SRA;
-import org.jboss.jbossts.star.annotation.Status;
-import org.jboss.jbossts.star.client.SRAParticipant;
-import org.jboss.jbossts.star.client.SRAStatus;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -72,7 +72,7 @@ public class TripController extends SRAParticipant {
     @PostConstruct
     void initController() {
         try {
-            int servicePort = Integer.getInteger(SERVICE_PORT_PROPERTY, 8081);
+            int servicePort = Integer.getInteger(SERVICE_PORT_PROPERTY, 8080);
             URL HOTEL_SERVICE_BASE_URL = new URL("http://localhost:" + servicePort);
             URL FLIGHT_SERVICE_BASE_URL = new URL("http://localhost:" + servicePort);
 
@@ -92,6 +92,21 @@ public class TripController extends SRAParticipant {
         flightClient.close();
     }
 
+    /**
+     * The quickstart scenario is:
+     *
+     * start LRA 1
+     *   Book hotel
+     *   start LRA 2
+     *     start LRA 3
+     *       Book flight option 1
+     *     start LRA 4
+     *       Book flight option 2
+     *
+     * @param hotelName hotel name
+     * @param hotelGuests number of beds required
+     * @param flightSeats number of people flying
+     */
     @POST
     @Path("/book")
     @Produces(MediaType.APPLICATION_JSON)
@@ -161,7 +176,7 @@ public class TripController extends SRAParticipant {
 
     @Override
     protected SRAStatus updateParticipantState(SRAStatus status, String activityId) {
-        System.out.printf("SRA: %s: Updating trip participant state to: %s%n", activityId, status);
+        System.out.printf("SRA: %s: Updating trip participant state to: %s", activityId, status);
         return status;
     }
 }
