@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
+<<<<<<< HEAD
 	JBoss, Home of Professional Open Source Copyright 2010, Red Hat
 	Middleware LLC, and others contributors as indicated by the @authors
 	tag. All rights reserved. See the copyright.txt in the distribution
@@ -14,10 +15,27 @@
 	License, v.2.1 along with this distribution; if not, write to the Free
 	Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 	02110-1301, USA.
+=======
+JBoss, Home of Professional Open Source Copyright 2009, Red Hat
+Middleware LLC, and others contributors as indicated by the @authors
+tag. All rights reserved. See the copyright.txt in the distribution
+for a full listing of individual contributors. This copyrighted
+material is made available to anyone wishing to use, modify, copy, or
+redistribute it subject to the terms and conditions of the GNU Lesser
+General Public License, v. 2.1. This program is distributed in the
+hope that it will be useful, but WITHOUT A WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the GNU Lesser General Public License for more details.
+You should have received a copy of the GNU Lesser General Public
+License, v.2.1 along with this distribution; if not, write to the Free
+Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301, USA.
+>>>>>>> a73b1183e1c8093a64d060c8471ab7d63d8e0a82
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
+<<<<<<< HEAD
     <groupId>org.jboss.narayana.quickstart.rts</groupId>
     <artifactId>rts-quickstarts</artifactId>
     <version>6.0.2.Final-SNAPSHOT</version>
@@ -75,4 +93,57 @@
     <module>jta-service</module>
     <module>undertow</module>
   </modules>
+=======
+    <groupId>org.jboss.narayana.rts</groupId>
+    <artifactId>rest-tx</artifactId>
+    <version>6.0.2.Final-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <artifactId>restat</artifactId>
+  <packaging>pom</packaging>
+  <name>Narayana: restat</name>
+  <description>RESTful Atomic Transactions</description>
+
+  <modules>
+    <module>util</module>
+    <module>tx</module>
+    <module>webservice</module>
+    <module>integration</module>
+    <module>bridge</module>
+  </modules>
+  <properties>
+    <checkstyle.skip>false</checkstyle.skip>
+    <sortpom.skip>false</sortpom.skip>
+    <version.asm>3.3.1</version.asm>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <inherited>false</inherited>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-install-plugin</artifactId>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <id>default-install</id>
+                <phase>install</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+>>>>>>> a73b1183e1c8093a64d060c8471ab7d63d8e0a82
 </project>

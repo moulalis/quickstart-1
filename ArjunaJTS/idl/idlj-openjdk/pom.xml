@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- JBoss, Home of Professional Open Source Copyright 2012, Red Hat Middleware 
+	LLC, and others contributors as indicated by the @authors tag. All rights 
+	reserved. See the copyright.txt in the distribution for a full listing of 
+	individual contributors. This copyrighted material is made available to anyone 
+	wishing to use, modify, copy, or redistribute it subject to the terms and 
+	conditions of the GNU Lesser General Public License, v. 2.1. This program 
+	is distributed in the hope that it will be useful, but WITHOUT A WARRANTY; 
+	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+	PURPOSE. See the GNU Lesser General Public License for more details. You 
+	should have received a copy of the GNU Lesser General Public License, v.2.1 
+	along with this distribution; if not, write to the Free Software Foundation, 
+	Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jboss.narayana.jts</groupId>
+    <artifactId>narayana-idl</artifactId>
+    <version>6.0.2.Final-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <artifactId>idlj-idl-openjdk</artifactId>
+  <packaging>jar</packaging>
+  <name>Narayana: ArjunaJTS idl idlj stubs with openjdk</name>
+  <description>Narayana: ArjunaJTS idl idlj stub compilation with openjdk</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.jboss.openjdk-orb</groupId>
+      <artifactId>openjdk-orb</artifactId>
+      <version>${version.org.jboss.openjdk-orb}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.openjdk-orb</groupId>
+      <artifactId>openjdk-orb</artifactId>
+      <version>${version.org.jboss.openjdk-orb}</version>
+      <classifier>sources</classifier>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>org/omg/CORBA/*</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <!-- generate a test jar containing test CORBA stubs for use by the jts tests -->
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/idl</source>
+                <source>${project.basedir}/../src/main/</source>
+              </sources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-test-source</id>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <phase>generate-test-sources</phase>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-test-sources/idl</source>
+                <source>${project.basedir}/../src/test/</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>attach-test-sources</id>
+            <goals>
+              <goal>test-jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-corba-idl</id>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.jboss.openjdk-orb</groupId>
+                  <artifactId>openjdk-orb</artifactId>
+                  <classifier>sources</classifier>
+                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                  <includes>**/*.idl</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>compile-idl-sources</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <tasks name="Generate idl stubs">
+                <property name="idl.compiler.class" value="com.sun.tools.corba.se.idl.toJavaPortable.Compile"></property>
+                <property location="${project.build.directory}/../../src/main/idl" name="idl.main.src"></property>
+                <property name="compile_classpath" value="${maven.compile.classpath}"></property>
+
+                <java classname="${idl.compiler.class}" failonerror="true" fork="true">
+                  <arg value="-i"></arg>
+                  <arg value="${idl.main.src}"></arg>
+                  <arg value="-td"></arg>
+                  <arg value="${project.build.directory}/generated-sources/idl"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="CosTransactions"></arg>
+                  <arg value="org.omg"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="XA"></arg>
+                  <arg value="org.omg"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="ArjunaOTS"></arg>
+                  <arg value="com.arjuna"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${idl.main.src}/omg"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${project.build.directory}/lib/com/sun/tools/corba/se/idl"></arg>
+                  <arg value="-d"></arg>
+                  <arg value="ORB_CURRENT_SUPPORT=1"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="${idl.main.src}/omg/CosTransactions.idl"></arg>
+                  <classpath refid="maven.compile.classpath"></classpath>
+                </java>
+                <delete>
+                  <fileset dir="${project.build.directory}/generated-sources/idl/org/omg/CORBA" includes="**/*"></fileset>
+                </delete>
+                <java classname="${idl.compiler.class}" failonerror="true" fork="true">
+                  <arg value="-i"></arg>
+                  <arg value="${idl.main.src}"></arg>
+                  <arg value="-td"></arg>
+                  <arg value="${project.build.directory}/generated-sources/idl"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="CosTransactions"></arg>
+                  <arg value="org.omg"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="XA"></arg>
+                  <arg value="org.omg"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="ArjunaOTS"></arg>
+                  <arg value="com.arjuna"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${idl.main.src}/omg"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${project.build.directory}/lib/com/sun/tools/corba/se/idl"></arg>
+                  <arg value="-d"></arg>
+                  <arg value="ORB_CURRENT_SUPPORT=1"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="${idl.main.src}/omg/XA.idl"></arg>
+                  <classpath refid="maven.compile.classpath"></classpath>
+                </java>
+
+                <java classname="${idl.compiler.class}" failonerror="true" fork="true">
+                  <arg value="-i"></arg>
+                  <arg value="${idl.main.src}"></arg>
+                  <arg value="-td"></arg>
+                  <arg value="${project.build.directory}/generated-sources/idl"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="CosTransactions"></arg>
+                  <arg value="org.omg"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="XA"></arg>
+                  <arg value="org.omg"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="ArjunaOTS"></arg>
+                  <arg value="com.arjuna"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${idl.main.src}/omg"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${project.build.directory}/lib/com/sun/tools/corba/se/idl"></arg>
+                  <arg value="-d"></arg>
+                  <arg value="ORB_CURRENT_SUPPORT=1"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="${idl.main.src}/arjuna/ArjunaOTS.idl"></arg>
+                  <classpath refid="maven.compile.classpath"></classpath>
+                </java>
+              </tasks>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-test-sources</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>generate-test-sources</phase>
+            <configuration>
+              <tasks>
+                <property name="idl.compiler.class" value="com.sun.tools.corba.se.idl.toJavaPortable.Compile"></property>
+                <property location="${project.build.directory}/../../src/test/idl" name="idl.test.src"></property>
+                <property location="${project.build.directory}/../../src/main/idl" name="idl.main.src"></property>
+                <property name="compile_classpath" value="${maven.compile.classpath}"></property>
+
+                <java classname="${idl.compiler.class}" failonerror="true" fork="true">
+                  <arg value="-i"></arg>
+                  <arg value="${idl.test.src}"></arg>
+                  <arg value="-td"></arg>
+                  <arg value="${project.build.directory}/generated-test-sources/idl"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="TestModule"></arg>
+                  <arg value="com.hp.mwtests.ts.jts"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="CosTransactions"></arg>
+                  <arg value="org.omg"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="orbtests"></arg>
+                  <arg value="com.hp.mwtests.orbportability.orbspecific"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${idl.main.src}/omg"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${project.build.directory}/lib/com/sun/tools/corba/se/idl"></arg>
+                  <arg value="-d"></arg>
+                  <arg value="ORB_CURRENT_SUPPORT=1"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="${idl.test.src}/orbtests.idl"></arg>
+                  <classpath refid="maven.compile.classpath"></classpath>
+                </java>
+                <java classname="${idl.compiler.class}" failonerror="true" fork="true">
+                  <arg value="-i"></arg>
+                  <arg value="${idl.test.src}"></arg>
+                  <arg value="-td"></arg>
+                  <arg value="${project.build.directory}/generated-test-sources/idl"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="TestModule"></arg>
+                  <arg value="com.hp.mwtests.ts.jts"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="CosTransactions"></arg>
+                  <arg value="org.omg"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="orbtests"></arg>
+                  <arg value="com.hp.mwtests.orbportability.orbspecific"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${idl.main.src}/omg"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${project.build.directory}/lib/com/sun/tools/corba/se/idl"></arg>
+                  <arg value="-d"></arg>
+                  <arg value="ORB_CURRENT_SUPPORT=1"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="${idl.test.src}/test.idl"></arg>
+                  <classpath refid="maven.compile.classpath"></classpath>
+                </java>
+                <java classname="${idl.compiler.class}" failonerror="true" fork="true">
+                  <arg value="-i"></arg>
+                  <arg value="${idl.test.src}"></arg>
+                  <arg value="-td"></arg>
+                  <arg value="${project.build.directory}/generated-test-sources/idl"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="TestModule"></arg>
+                  <arg value="com.hp.mwtests.ts.jts"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="CosTransactions"></arg>
+                  <arg value="org.omg"></arg>
+                  <arg value="-pkgPrefix"></arg>
+                  <arg value="orbtests"></arg>
+                  <arg value="com.hp.mwtests.orbportability.orbspecific"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${idl.main.src}/omg"></arg>
+                  <arg value="-i"></arg>
+                  <arg value="${project.build.directory}/lib/com/sun/tools/corba/se/idl"></arg>
+                  <arg value="-d"></arg>
+                  <arg value="ORB_CURRENT_SUPPORT=1"></arg>
+                  <arg value="-fallTIE"></arg>
+                  <arg value="${idl.test.src}/TestModule.idl"></arg>
+                  <classpath refid="maven.compile.classpath"></classpath>
+                </java>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

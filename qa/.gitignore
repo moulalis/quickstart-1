@@ -1,0 +1,14 @@
+.classpath
+.project
+dbdrivers
+dist
+ext
+idl-compiler.*
+build
+*.properties
+PutObjectStoreDirHere/
+ServerIORs
+TEST-*
+testoutput/
+testoutput-openjdk.zip
+transaction.log

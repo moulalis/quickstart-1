@@ -1,4 +1,5 @@
 @echo off
+<<<<<<< HEAD
 REM  ======================================================================
 REM
 REM  This is the main entry point for the build system.
@@ -22,12 +23,17 @@ REM ******************************************************
 REM Ignore the users classpath, cause it might mess
 REM things up
 REM ******************************************************
+=======
+
+set PWD=%~dp0
+>>>>>>> a73b1183e1c8093a64d060c8471ab7d63d8e0a82
 
 SETLOCAL
 
 set CLASSPATH=
 set M2_HOME=
 set MAVEN_HOME=
+<<<<<<< HEAD
 set MAVEN_OPTS=%MAVEN_OPTS% -Xmx768M
 powershell -noprofile -executionpolicy bypass -file "tools\download-maven.ps1"
 
@@ -93,3 +99,16 @@ call %1 %GOAL% %3 %4 %5 %6 %7 %8
 
 if "%NOPAUSE%" == "" pause
 
+=======
+
+set MAVEN_OPTS=%MAVEN_OPTS% -Xms1024m -XX:MaxMetaspaceSize=256m
+set MVN_OPTIONS=-gs .mvn\wrapper\settings.xml -Dorson.jar.location=%PWD%\ext\ -Dbpa=vc9x32
+
+set MVN=%PWD%mvnw.cmd
+set GOAL=%1
+if "%GOAL%"=="" set GOAL=install
+echo Calling %MVN% %MVN_OPTIONS% %GOAL% %2 %3 %4 %5 %6 %7 %8
+call %MVN% %MVN_OPTIONS% %GOAL% %2 %3 %4 %5 %6 %7 %8
+
+if "%NOPAUSE%" == "" pause
+>>>>>>> a73b1183e1c8093a64d060c8471ab7d63d8e0a82

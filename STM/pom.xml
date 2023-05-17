@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0"?>
 <!-- JBoss, Home of Professional Open Source Copyright 2008, Red Hat Middleware 
 	LLC, and others contributors as indicated by the @authors tag. All rights 
@@ -64,3 +65,114 @@
     <module>jta</module>
   </modules>
 </project>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jboss.narayana</groupId>
+    <artifactId>narayana-all</artifactId>
+    <version>6.0.2.Final-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>org.jboss.narayana.stm</groupId>
+  <artifactId>stm</artifactId>
+  <name>Narayana: STM</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <sortpom.skip>true</sortpom.skip>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <inherited>false</inherited>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.narayana</groupId>
+        <artifactId>narayana-bom</artifactId>
+        <version>6.0.2.Final-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana</groupId>
+      <artifactId>common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.arjunacore</groupId>
+      <artifactId>arjuna</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.arjunacore</groupId>
+      <artifactId>txoj</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging-processor</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <profiles>
+    <profile>
+        <id>release</id>
+        <build>
+            <plugins>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <executions>
+                  <execution>
+                    <id>default-install</id>
+                    <phase>install</phase>
+                  </execution>
+                </executions>
+                <inherited>false</inherited>
+              </plugin>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                  <execution>
+                    <id>attach-javadocs</id>
+                    <goals>
+                      <goal>jar</goal>
+                    </goals>
+                  </execution>
+                </executions>
+                <configuration>
+              <source>8</source>
+              <detectOfflineLinks>false</detectOfflineLinks>
+              <excludePackageNames>*.internal.*</excludePackageNames>
+            </configuration>
+          </plugin>
+            </plugins>
+        </build>
+    </profile>
+  </profiles>
+</project>
+
+>>>>>>> a73b1183e1c8093a64d060c8471ab7d63d8e0a82
