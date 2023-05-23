@@ -8,8 +8,8 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <packaging>pom</packaging>
-    <artifactId>annotations</artifactId>
-    <name>REST-AT Annotation</name>
+    <artifactId>annotation</artifactId>
+    <name>REST-AT Annotation Example</name>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -21,6 +21,13 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+   <modules>
+        <module>common-service</module>
+        <module>flight-service</module>
+        <module>hotel-service</module>
+        <module>trip-service</module>
+  </modules>
+
     <properties>
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <narayana.nodename.property>CoreEnvironmentBean.nodeIdentifier</narayana.nodename.property>
@@ -30,7 +37,7 @@
     </properties>
 
     <build>
-        <finalName>sra-trip-service</finalName>
+        <finalName>rest-at-annotation-service</finalName>
         <plugins>
             <plugin>
                 <groupId>io.quarkus</groupId>
