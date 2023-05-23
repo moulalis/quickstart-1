@@ -64,8 +64,8 @@ public class TripController extends SRAParticipant {
     @PostConstruct
     void initController() {
         try {
-            int hotelServicePort = Integer.getInteger(ServiceConstant.HOTEL_SERVICE_PORT_PROPERTY, 8084);
-            int flightServicePort = Integer.getInteger(ServiceConstant.FLIGHT_SERVICE_PORT_PROPERTY, 8083);
+            int hotelServicePort = Integer.getInteger(ServiceConstant.HOTEL_SERVICE_PORT_PROPERTY, 8083);
+            int flightServicePort = Integer.getInteger(ServiceConstant.FLIGHT_SERVICE_PORT_PROPERTY, 8084);
 
             URL HOTEL_SERVICE_BASE_URL = new URL("http://localhost:" + hotelServicePort);
             URL FLIGHT_SERVICE_BASE_URL = new URL("http://localhost:" + flightServicePort);

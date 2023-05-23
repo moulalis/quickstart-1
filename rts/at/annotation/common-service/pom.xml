@@ -18,5 +18,5 @@
 
     <groupId>org.jboss.narayana.quickstart.rts</groupId>
     <artifactId>common-service</artifactId>
-    <name>Archetype - common-service</name>
+    <name>common-service</name>
 </project>
