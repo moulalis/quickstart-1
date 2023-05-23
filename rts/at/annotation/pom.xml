@@ -9,7 +9,7 @@
     </parent>
     <packaging>pom</packaging>
     <artifactId>annotations</artifactId>
-    <name>REST-AT Annotation</name>
+    <name>REST-AT Annotation Example</name>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -21,6 +21,10 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <modules>
+        <module>flight-service</module>
+    </modules>
+
     <properties>
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <narayana.nodename.property>CoreEnvironmentBean.nodeIdentifier</narayana.nodename.property>
