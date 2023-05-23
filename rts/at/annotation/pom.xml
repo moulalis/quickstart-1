@@ -1,26 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jboss.narayana.quickstart.rts</groupId>
-        <artifactId>restat-quickstarts</artifactId>
+        <artifactId>rts-quickstarts</artifactId>
         <version>6.0.2.Final-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>sra-participant</artifactId>
+    <packaging>pom</packaging>
+    <artifactId>annotations</artifactId>
     <name>REST-AT Annotation Example</name>
-    <packaging>jar</packaging>
-
-    <properties>
-        <failOnMissingWebXml>false</failOnMissingWebXml>
-        <narayana.nodename.property>CoreEnvironmentBean.nodeIdentifier</narayana.nodename.property>
-        <surefire-plugin.version>2.22.0</surefire-plugin.version>
-        <version.quarkus>3.0.0.Alpha5</version.quarkus>
-        <jakarta.ws.rs.version>3.1.0</jakarta.ws.rs.version>
-    </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -32,9 +21,22 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <modules>
+        <module>flight-service</module>
+        <module>hotel-service</module>
+        <module>trip-service</module>
+    </modules>
+
+    <properties>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+        <narayana.nodename.property>CoreEnvironmentBean.nodeIdentifier</narayana.nodename.property>
+        <surefire-plugin.version>2.22.0</surefire-plugin.version>
+        <version.quarkus>3.0.0.Alpha5</version.quarkus>
+        <jakarta.ws.rs.version>3.1.0</jakarta.ws.rs.version>
+    </properties>
 
     <build>
-        <finalName>sra-participant</finalName>
+        <finalName>sra-trip-service</finalName>
         <plugins>
             <plugin>
                 <groupId>io.quarkus</groupId>
