@@ -1,23 +1,13 @@
-/*
- * JBoss, Home of Professional Open Source
- * Copyright 2014, Red Hat, Inc. and/or its affiliates, and individual
- * contributors by the @authors tag. See the copyright.txt in the
- * distribution for a full listing of individual contributors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.jboss.narayana.quickstarts.jta;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.as.arquillian.api.ServerSetup;
+import org.jboss.as.arquillian.api.ServerSetupTask;
+import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -26,10 +16,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.wildfly.extras.creaper.core.online.FailuresAllowedBlock;
+import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
+import org.wildfly.extras.creaper.core.online.OnlineOptions;
+import org.wildfly.extras.creaper.core.online.operations.admin.Administration;
 
 import jakarta.inject.Inject;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import jakarta.transaction.Transaction;
 import jakarta.transaction.TransactionManager;
 import jakarta.transaction.TransactionalException;
@@ -38,7 +30,34 @@ import jakarta.transaction.TransactionalException;
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
 @RunWith(Arquillian.class)
+@ServerSetup(value = TestCase.ServerTestSetup.class)
 public class TestCase {
+
+    public static class ServerTestSetup implements ServerSetupTask {
+
+        @Override
+        public void setup(ManagementClient managementClient, String containerId) throws Exception {
+            OnlineManagementClient creaper = org.wildfly.extras.creaper.core.ManagementClient
+                    .online(OnlineOptions.standalone().wrap(managementClient.getControllerClient()));
+            try (FailuresAllowedBlock allowedBlock = creaper.allowFailures()) {
+                creaper.execute(
+                        "/subsystem=messaging-activemq/server=default/jms-queue=\"test\":add(entries=[java:/queue/test])");
+                creaper.execute(
+                        "/subsystem=datasources/data-source=QuickstartTestDS:add(connection-url=\"jdbc:h2:mem:quickstart-test\", jndi-name=\"java:jboss/datasources/QuickstartTestDS\", driver-name=h2, user-name=\"sa\", password=\"sa\")");
+            }
+            new Administration(creaper).reload();
+        }
+
+        @Override
+        public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
+            OnlineManagementClient creaper = org.wildfly.extras.creaper.core.ManagementClient
+                    .online(OnlineOptions.standalone().wrap(managementClient.getControllerClient()));
+            try (FailuresAllowedBlock allowedBlock = creaper.allowFailures()) {
+                creaper.execute("/subsystem=messaging-activemq/server=default/jms-queue=\"test\":remove()");
+                creaper.execute("/subsystem=datasources/data-source=QuickstartTestDS:remove()");
+            }
+        }
+    }
 
     @Inject
     private QuickstartQueue quickstartQueue;
@@ -56,8 +75,6 @@ public class TestCase {
         return ShrinkWrap.create(WebArchive.class, "test.war")
                 .addPackages(true, QuickstartEntity.class.getPackage().getName())
                 .addAsResource("META-INF/test-persistence.xml", "META-INF/persistence.xml")
-                .addAsWebInfResource("test-ds.xml", "test-ds.xml")
-                .addAsWebInfResource("test-jms.xml", "test-jms.xml")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
